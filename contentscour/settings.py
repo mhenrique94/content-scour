@@ -25,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.environ.get('DEBUG') == 'True'
+print("debuggeeeeer", DEBUG)
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
@@ -132,4 +133,5 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
