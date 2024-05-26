@@ -5,7 +5,7 @@ from contentscour import settings
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("api/", views.index, name="index"),
 ]
 
 if settings.DEBUG:
