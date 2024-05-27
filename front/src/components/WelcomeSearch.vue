@@ -1,19 +1,20 @@
 <template>
-    <div v-if="!stream.length > 0">
-        <h3>Search, baby</h3>
-        <v-text-field v-model="userInput" label="Search" variant="outlined" />
-        <v-btn @click="submitQuery">Send</v-btn>
-    </div>
+<div class="pa-4">
+    <v-text-field v-model="userInput" label="Search" variant="outlined" />
+    <v-btn @click="submitQuery" :loading="loading">Send</v-btn>
+</div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useCoreStore } from '@/stores/core'
 
 const coreStore = useCoreStore()
 const userInput = ref('')
 
-const stream = coreStore.stream
+const loading = computed(() => {
+  return coreStore.loading
+})
 
 const submitQuery = async () => {
     if (userInput.value) {
