@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    'corsheaders',
     'core'
 ]
 
@@ -138,3 +139,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_HTTPONLY = False
+
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+
+# CORS
+if DEBUG:
+    before_common = MIDDLEWARE.index("django.middleware.common.CommonMiddleware")
+    MIDDLEWARE.insert(before_common, "corsheaders.middleware.CorsMiddleware")
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOWED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")

@@ -2,7 +2,8 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
-
+from django.views.decorators.csrf import csrf_exempt
+import requests
 
 AI_ENDPOINT = settings.AI_ENDPOINT
 AI_MODEL_NAME = settings.AI_MODEL_NAME
@@ -12,6 +13,7 @@ HEADERS = {
     'Authorization': f"Bearer {AI_API_KEY}"
 }
 
+@csrf_exempt
 def index(request):
     if request.method == 'POST':
         query = request.POST.get('query')
@@ -27,9 +29,10 @@ def index(request):
                 "max_tokens": 256,
                 "temperature": 0.7
             })
-            response = request("POST", AI_ENDPOINT, headers=HEADERS, data=payload)
-            return JsonResponse(response)
-        return JsonResponse()
+            response = requests.request("POST", AI_ENDPOINT, headers=HEADERS, data=payload)
+            json_resp = response.json()
+            return JsonResponse(json_resp)
+        return JsonResponse({})
     return render(request, 'index.html')
 
 
