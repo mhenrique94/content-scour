@@ -9,6 +9,21 @@ services:
       - 5678:5678
     env_file:
       - ./.env
+  frontend:
+    build:
+      context: ./front
+    image: front
+    hostname: front
+    command: npm run dev -- --host
+    ports:
+      - 3000:3000
+    expose:
+      - "3000"
+    env_file:
+      - .env
+    volumes:
+      - /front/node_modules
+      - ./front:/front
   db:
     container_name: db
     image: postgres:15
@@ -16,6 +31,14 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env
+  nginx:
+    image: nginx
+    ports:
+      - 80:7999
+    volumes:
+      - ./nginx/default_local:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - server
 
 volumes:
   postgres_data:

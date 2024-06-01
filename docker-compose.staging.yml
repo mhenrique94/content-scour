@@ -12,6 +12,21 @@ services:
       - 8000
     env_file:
       - ./.env.staging
+  frontend:
+    build:
+      context: ./front
+    image: public.ecr.aws/v4q1e7f2/server-django-ec2:front
+    hostname: front
+    command: npm run dev -- --host
+    ports:
+      - 3000:3000
+    expose:
+      - "3000"
+    env_file:
+      - ../.env.staging
+    volumes:
+      - /front/node_modules
+      - ./front:/front
   nginx:
     container_name: nginx
     build: ./nginx
@@ -21,12 +36,11 @@ services:
       - static_volume:/home/app/server/staticfiles
       - media_volume:/home/app/server/mediafiles
       - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
-      - vhost:/etc/nginx/vhost.d
+      - ./nginx/staging_local:/etc/nginx/conf.d/default.conf
       - /var/run/docker.sock:/tmp/docker.sock:ro
     ports:
       - 443:443
-      - 80:80
+      - 80:7999
     depends_on:
       - server
   acme-companion:
