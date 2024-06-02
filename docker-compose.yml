@@ -1,44 +1,39 @@
 services:
   server:
-    build: .
-    command: ["sh", "-c", "python3 -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000"]
-    volumes:
-      - ./:/usr/src/app/
-    ports:
-      - 8000:8000
-      - 5678:5678
-    env_file:
-      - ./.env
-  frontend:
     build:
-      context: ./front
-    image: front
-    hostname: front
-    command: npm run dev -- --host
-    ports:
-      - 3000:3000
+      context: .
+      dockerfile: Dockerfile.prod
+    command: gunicorn contentscour.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/home/app/server/staticfiles
+      - media_volume:/home/app/server/mediafiles
     expose:
-      - "3000"
+      - 8000
     env_file:
-      - .env
-    volumes:
-      - /front/node_modules
-      - ./front:/front
-  db:
-    container_name: db
-    image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.env
+      - ./.env.prod
   nginx:
-    image: nginx
+    restart: unless-stopped
+    build:
+        context: .
+        dockerfile: ./docker/nginx/Dockerfile
     ports:
-      - 80:7999
+        - 80:80
+        - 443:443
     volumes:
-      - ./nginx/default_local:/etc/nginx/conf.d/default.conf
+        - static_volume:/app/backend/server/django_static
+        - ./docker/nginx/production:/etc/nginx/conf.d
+        - ./docker/nginx/certbot/conf:/etc/letsencrypt
+        - ./docker/nginx/certbot/www:/var/www/certbot
     depends_on:
       - server
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/certbot/conf:/etc/letsencrypt
+      - ./docker/nginx/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"  
 
 volumes:
-  postgres_data:
+  static_volume:
+  media_volume:

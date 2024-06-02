@@ -61,6 +61,7 @@ RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 
 # copy project
 COPY . $APP_HOME
+# ADD ./docker $APP_HOME/docker
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME

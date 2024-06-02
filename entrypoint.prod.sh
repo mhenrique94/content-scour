@@ -11,4 +11,5 @@ then
     echo "RDS PostgreSQL iniciado!"
 fi
 
+# exec ./manage.py collectstatic --noinput
 exec gunicorn contentscour.wsgi:application --bind 0.0.0.0:8000
