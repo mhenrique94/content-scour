@@ -22,11 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-AI_ENDPOINT = os.environ.get('AI_ENDPOINT')
-AI_MODEL_NAME = os.environ.get('AI_MODEL_NAME')
-AI_API_KEY = os.environ.get('AI_API_KEY')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
@@ -90,7 +85,7 @@ DATABASES = {
        'PASSWORD': os.environ.get('DB_PASSWORD'),
        'HOST': os.environ.get('DB_HOST'),
        'PORT': os.environ.get('DB_PORT'),
-   }
+   },
 }
 
 
@@ -138,16 +133,30 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# CORS e CSRF
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False
 
-CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+LOCAL_LLM = DEBUG
 
-# CORS
 if DEBUG:
     before_common = MIDDLEWARE.index("django.middleware.common.CommonMiddleware")
     MIDDLEWARE.insert(before_common, "corsheaders.middleware.CorsMiddleware")
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOWED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
+
+# Ai
+DB_VECTOR_PORT = os.environ['DB_VECTOR_PORT']
+DB_VECTOR_USER = os.environ['DB_VECTOR_USER']
+DB_VECTOR_PASSWORD = os.environ['DB_VECTOR_PASSWORD']
+
+GROQ_API_KEY = os.environ['GROQ_API_KEY']
+GROQ_API_MODEL = os.environ['GROQ_API_MODEL']
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+AI_ENDPOINT = os.environ.get('AI_ENDPOINT')
+AI_MODEL_NAME = os.environ.get('AI_MODEL_NAME')
+AI_API_KEY = os.environ.get('AI_API_KEY')

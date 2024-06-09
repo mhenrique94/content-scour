@@ -8,13 +8,14 @@ services:
       - 8000:8000
       - 5678:5678
     expose:
-      - 8000  
+      - 8000
     env_file:
       - ./.env
   db:
     container_name: db
-    image: postgres:15
+    image: pgvector/pgvector:pg15
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env
@@ -28,9 +29,10 @@ services:
     volumes:
         - static_volume:/app/server/staticfiles
         - ./docker/nginx/development:/etc/nginx/conf.d
-    depends_on: 
+    depends_on:
         - server
 
 volumes:
   postgres_data:
+  vector_data:
   static_volume:

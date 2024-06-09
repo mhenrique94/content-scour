@@ -22,7 +22,7 @@ RUN pip install flake8==6.0.0
 COPY . /usr/src/app/
 
 # install python dependencies
-COPY ./requirements.txt .
+COPY ./requirements.prod.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 
@@ -50,7 +50,7 @@ WORKDIR $APP_HOME
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends netcat
 COPY --from=builder /usr/src/app/wheels /wheels
-COPY --from=builder /usr/src/app/requirements.txt .
+COPY --from=builder /usr/src/app/requirements.prod.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 

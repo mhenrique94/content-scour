@@ -6,6 +6,8 @@ from . import views
 
 urlpatterns = [
     path("api/", views.index, name="index"),
+    path("api/chatbot/", views.chatbot),
+    path("api/similarity_search/", views.similarity_search)
 ]
 
 if settings.DEBUG:
