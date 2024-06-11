@@ -1,11 +1,11 @@
 <script setup>
 import ChatStream from '@/components/chat-stream/ChatStream.vue'
-import TheWelcome from '@/components/TheWelcome.vue'
-import WelcomeSearch from '@/components/WelcomeSearch.vue'
+import WelcomeSearch from '@/components/home/WelcomeSearch.vue'
 import { computed } from 'vue'
-import { useCoreStore } from '@/stores/core'
+import { useCoreStore, useAuthStore } from '@/stores'
 
 const coreStore = useCoreStore()
+const authStore = useAuthStore()
 
 const openChat = computed(() => {
   return coreStore.stream.length > 0
@@ -13,9 +13,10 @@ const openChat = computed(() => {
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-    <ChatStream v-if="openChat" />
-    <WelcomeSearch v-else />
+  <main v-if="authStore.isAuthenticated">
+    <div class="pa-4">
+      <ChatStream v-if="openChat" />
+      <WelcomeSearch v-else />
+    </div>
   </main>
 </template>

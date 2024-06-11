@@ -138,7 +138,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_NAME = "csrftoken"
-CSRF_COOKIE_HTTPONLY = False
+
 
 LOCAL_LLM = DEBUG
 
@@ -147,6 +147,13 @@ if DEBUG:
     MIDDLEWARE.insert(before_common, "corsheaders.middleware.CorsMiddleware")
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOWED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
+else:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Strict'
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    SESSION_COOKIE_HTTPONLY = True
 
 # Ai
 DB_VECTOR_PORT = os.environ['DB_VECTOR_PORT']
