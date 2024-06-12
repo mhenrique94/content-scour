@@ -1,10 +1,8 @@
-# import os
-# import base64
+import csv
 from django.conf import settings
 
-# from langchain_core.documents import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
-# from langchain_text_splitters import MarkdownTextSplitter
+from langchain_core.documents import Document as lc_document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts.prompt import PromptTemplate
 from langchain_postgres import PGVector
 from langchain_groq import ChatGroq
@@ -15,40 +13,49 @@ embedding_model_kwargs = {'device': 'cpu'}
 embedding_encode_kwargs = {'normalize_embeddings': False}
 
 CONNECTION_STRING = (
-    f"postgresql+psycopg://{settings.DB_VECTOR_USER}:{settings.DB_VECTOR_PASSWORD}"
-    f"@localhost:{settings.DB_VECTOR_PORT}/postgres?sslmode=allow"
+    f"postgresql+psycopg://{settings.DB_USER}:{settings.DB_PASSWORD}"
+    f"@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}?sslmode=allow"
 )
-
 COLLECTION_NAME = 'langchain_collection'
-
 IS_LOCAL = settings.LOCAL_LLM
-# def process_embedding_from_docs() :
-#     text_splitter = MarkdownTextSplitter(chunk_size = 1000, chunk_overlap = 20)
 
-#     files = os.listdir('./docs')
+hf = HuggingFaceEmbeddings(
+            model_name=embedding_model_id,
+            model_kwargs=embedding_model_kwargs,
+            encode_kwargs=embedding_encode_kwargs
+        )
 
-#     for file in files:
-#         file_path = f"./docs/{file}"
-#         document = Document(page_content=file_path, metadata={"source": file_path})
-#         texts = text_splitter.split_documents([document])
-
-#         db = PGVector.from_documents(
-#             embedding=hf,
-#             documents=texts,
-#             collection_name=COLLECTION_NAME,
-#             connection=CONNECTION_STRING
-#         )
-
-#         return db
-
-
-# def process_embedding_from_base64(base64_file):
-#     file_bytes = base64.b64decode(base64_file)
-
-
-def similarity_search(query):
+def process_user_document(document, user):
+    file = document.file.file
+    collection = f"{user.id}{user.username}_collection"
+    if document.file_type == ".csv":
+        data = csv.DictReader(file)
+        content = ""
+        for line in data:
+          content += f"{line}\n"
+    else:
+        content = file.read().decode('utf-8')
     
-    chat, retriever = _get_llm(IS_LOCAL)
+    processed_lc_document = lc_document(page_content=content, metadata={"source": document.file.name})
+
+    if IS_LOCAL:
+        PGVector.from_documents(
+            embedding=hf,
+            documents=[processed_lc_document],
+            collection_name=collection,
+            connection=CONNECTION_STRING
+        )
+    else:
+        # logica da ai21 vai aqui, lembrando que o vetor tem um campo no model Document
+        print("não implementado")
+
+    document.processed = True
+    document.save()
+
+
+def similarity_search(query, user):
+    collection = f"{user.id}{user.username}_collection"
+    chat, retriever = _get_llm(IS_LOCAL, collection)
 
     prompt = set_custom_prompt()
 
@@ -81,23 +88,9 @@ def set_custom_prompt():
     return prompt
 
 
-def _get_llm(is_local):
-    # collection tem que ter o id do usuário usando, então:
-    # - criar sistema de login
-    # - criar logica de upload de documentos do user associando doc > user_id
-
-    # para definir o que vai processar
-    # - recuperar o collection pertencente ao user da request
-
+def _get_llm(is_local, collection):
     if is_local:
-        hf = HuggingFaceEmbeddings(
-            model_name=embedding_model_id,
-            model_kwargs=embedding_model_kwargs,
-            encode_kwargs=embedding_encode_kwargs
-        )
-
-
-        db = PGVector.from_existing_index(hf, collection_name=COLLECTION_NAME, connection=CONNECTION_STRING)
+        db = PGVector.from_existing_index(hf, collection_name=collection, connection=CONNECTION_STRING)
         retriever = db.as_retriever(search_kwargs={'k': 3})
         chat = ChatGroq(
             temperature=0,

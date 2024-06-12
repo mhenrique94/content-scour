@@ -12,4 +12,5 @@ then
 fi
 
 # exec ./manage.py collectstatic --noinput
+exec python manage.py migrate
 exec gunicorn contentscour.wsgi:application --bind 0.0.0.0:8000

@@ -1,13 +1,11 @@
-import { useAuthStore } from '@/stores';
-import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores'
 
 export default function (to, from, next) {
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    const authStore = useAuthStore();
-    const router = useRouter()
-    if (requiresAuth && !authStore.isAuthenticated) {
-      next({ name: 'login' })
-    } else {
-      next();
-    }
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const authStore = useAuthStore();
+  if (requiresAuth && !authStore.isAuthenticated) {
+    next({ path: '/login' })
+  } else {
+    next();
   }
+}
