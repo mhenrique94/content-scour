@@ -13,13 +13,16 @@
           <div class="d-flex justify-space-between align-center pb-2">
             <span class="mr-2">{{ document.filename }} ({{ document.file_type }})</span>
             <div>
+              <v-btn
+                v-if="!document.processed" @click="processDocument(document.id)"
+                class="mr-2"
+              >
+                <v-icon color="black">mdi-orbit-variant</v-icon>
+              </v-btn>
+              <span v-else class="mr-2">Processed</span>
               <v-btn @click="deleteDocument(document.id)" class="mr-2">
                 <v-icon color="black">mdi-delete</v-icon>
               </v-btn>
-              <v-btn v-if="!document.processed" @click="processDocument(document.id)">
-                <v-icon color="black">mdi-orbit-variant</v-icon>
-              </v-btn>
-              <span v-else>Processed</span>
             </div>
           </div>
           <v-divider />

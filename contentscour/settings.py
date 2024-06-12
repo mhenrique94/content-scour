@@ -162,12 +162,10 @@ else:
     SESSION_COOKIE_HTTPONLY = True
 
 # Ai
-DB_VECTOR_PORT = os.environ['DB_VECTOR_PORT']
-DB_VECTOR_USER = os.environ['DB_VECTOR_USER']
-DB_VECTOR_PASSWORD = os.environ['DB_VECTOR_PASSWORD']
-
 GROQ_API_KEY = os.environ['GROQ_API_KEY']
 GROQ_API_MODEL = os.environ['GROQ_API_MODEL']
+
+AI21_API_KEY = os.environ['AI21_API_KEY']
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 AI_ENDPOINT = os.environ.get('AI_ENDPOINT')

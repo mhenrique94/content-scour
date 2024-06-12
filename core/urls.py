@@ -7,7 +7,7 @@ from . import views
 urlpatterns = [
     path("api/", views.index, name="index"),
     path("api/chatbot/", views.chatbot),
-    path("api/similarity_search/", views.similarity_search),
+    path("api/rag_from_query/", views.rag_from_query),
     path('api/document_upload/', views.document_upload),
     path('api/document_list/', views.document_list),
     path('api/document_delete/<int:pk>/', views.delete_document),

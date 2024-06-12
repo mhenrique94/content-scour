@@ -27,11 +27,11 @@ def index(request):
 
 
 @require_POST
-def similarity_search(request):
+def rag_from_query(request):
     query = request.POST.get('query')
     user = request.user
     if query:
-        processed_query = ai_svc.similarity_search(query, user)
+        processed_query = ai_svc.rag_from_query(query, user)
         json_resp = processed_query.json()
         return JsonResponse(json_resp)
     return JsonResponse({'message': 'Erro: Type something!'}, status=500)
@@ -88,9 +88,10 @@ def document_list(request):
 @login_required
 def delete_document(request, pk):
     document = Document.objects.get(pk=pk)
-    if document.user == request.user:
-        document.delete()
-        documents = get_user_documents(request.user)
+    user = request.user
+    if document.user == user:
+        ai_svc.delete_user_document(document, user)
+        documents = get_user_documents(user)
         return JsonResponse({'documents': list(documents)})
     else:
         return HttpResponseBadRequest('Exclusion denied.')
