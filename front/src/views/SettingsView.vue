@@ -1,18 +1,27 @@
 <template>
   <div class="pa-4">
-    <h3>Files</h3>
+    <h3>Document upload</h3>
+    <h4>Formats accepted: .TXT, .PDF, .CSV</h4>
     <form @submit.prevent="onSubmit">
-      <v-file-input multiple ref="filesInput" label="Select file" />
+      <v-file-input
+        ref="filesInput"
+        clear-on-submit
+        multiple
+        label="Select file"
+        accept="text/plain, application/pdf, .csv"
+      />
       <v-btn type="submit" :disabled="uploading">Send</v-btn>
     </form>
 
-    <v-card class="mt-5 pa-3" color="grey">
-      <h2>Documents</h2>
-      <v-card color="black" class="documents-container">
+    <v-card class="mt-5 pa-3 documents-card" color="grey">
+      <h2 class="text-black">Documents</h2>
+      <v-card v-if="documents.length" class="documents-container">
         <div v-for="document in documents" :key="document.id">
           <div class="d-flex justify-space-between align-center pb-2">
-            <span class="mr-2">{{ document.filename }} ({{ document.file_type }})</span>
-            <div>
+            <span class="mr-2 text-white">
+              {{ new Date(document.uploaded_at) }} {{ document.filename }}.{{ document.file_type }}
+            </span>
+            <div class="text-white">
               <v-btn
                 v-if="!document.processed" @click="processDocument(document.id)"
                 class="mr-2"
@@ -25,9 +34,10 @@
               </v-btn>
             </div>
           </div>
-          <v-divider />
+          <v-divider class="text-white"/>
         </div>
       </v-card>
+      <div v-else class="documents-container">Nothing here, YET!</div>
     </v-card>
   </div>
 </template>
@@ -87,8 +97,7 @@ const deleteDocument = async (id) => {
 const processDocument = async (id) => {
   processing.value = true
   try {
-    const response = await coreStore.processDocument(id)
-    documents.value = response.documents
+    documents.value = await coreStore.processDocument(id)
   } catch (error) {
     console.error(error)
   } finally {
@@ -99,9 +108,16 @@ const processDocument = async (id) => {
 </script>
 
 <style scoped>
+.documents-card {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 260px;
+}
+
 .documents-container {
-  background-color: black;
-  min-height: 200px;
+  background-color: var(--color-background);
+  height: 100%;
   padding: 16px;
 }
 </style>

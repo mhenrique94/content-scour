@@ -32,8 +32,7 @@ def rag_from_query(request):
     user = request.user
     if query:
         processed_query = ai_svc.rag_from_query(query, user)
-        json_resp = processed_query.json()
-        return JsonResponse(json_resp)
+        return JsonResponse(processed_query)
     return JsonResponse({'message': 'Erro: Type something!'}, status=500)
 
 

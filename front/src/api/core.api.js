@@ -23,4 +23,10 @@ export default {
     const response = await api.post(`/api/document_process/${id}/`)
     return response.data
   },
+  ragFromQuery: async (query) => {
+    const formData = new FormData()
+    formData.set("query", query)
+    const response = await api.post(`/api/rag_from_query/`, formData)
+    return response.data
+  }
 }
